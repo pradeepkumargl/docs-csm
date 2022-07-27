@@ -49,12 +49,12 @@
         /opt/cray/platform-utils/move_pod.sh <pod_name> <target_node>
         ```
 
-1. (`ncn-m001#`) Run `ncn-upgrade-worker-nodes.sh` for `ncn-w001`.
+1. (`ncn-m001#`) Run `ncn-upgrade-worker-storage-nodes.sh` for `ncn-w001`.
 
    Follow output of the script carefully. The script will pause for manual interaction.
 
    ```bash
-   /usr/share/doc/csm/upgrade/scripts/upgrade/ncn-upgrade-worker-nodes.sh ncn-w001
+   /usr/share/doc/csm/upgrade/scripts/upgrade/ncn-upgrade-worker-storage-nodes.sh ncn-w001
    ```
 
    > **`NOTE`** The root password for the node may need to be reset after it is rebooted.
@@ -66,7 +66,7 @@
 >> You can also upgrade multiple workers at the same time with comma separated list.
 >
 > ```bash
-> /usr/share/doc/csm/upgrade/scripts/upgrade/ncn-upgrade-worker-nodes.sh ncn-w001,ncn-w002,ncn-w003
+> /usr/share/doc/csm/upgrade/scripts/upgrade/ncn-upgrade-worker-storage-nodes.sh ncn-w001,ncn-w002,ncn-w003
 >```
 >
 >>
