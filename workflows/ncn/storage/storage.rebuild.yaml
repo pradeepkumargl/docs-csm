@@ -132,6 +132,7 @@ spec:
                     RESULT=$(/opt/cray/platform-utils/ceph-service-status.sh -n {{$value}} -a true)
                     if [[ $RESULT -ne 0 ]]
                     then
+
                       echo "ceph serice status check failed for node {{$value}}"
                       exit 1
                     fi
@@ -185,6 +186,7 @@ spec:
                         then
                           echo "WARNING: A node exporter was not refreshed after node exporter was deployed in the previous step."
                           echo $(ceph orch ps --daemon_type node-exporter)
+
                         fi
                       done
                       # verify there is only 1 alertmanager
@@ -235,3 +237,4 @@ spec:
                       echo "$RESULT"
                       exit 7
                     fi
+
