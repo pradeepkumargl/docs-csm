@@ -452,7 +452,10 @@ For more information, see [dracut cmdline's definition of LVM parameters][15] an
 | :------: | :------------: |
 | All | `1` |
 
-For more information, see
+Whether or not `lvm` is enabled in the initramFS.
+
+For more information, see [dracut cmdline's definition of LVM parameters][15] and
+[dracut-metal-luksetc's usage][20].
 
 ##### `rd.auto`
 
@@ -460,11 +463,17 @@ For more information, see
 | :------: | :------------: |
 | All | `1` |
 
+Enable autoassembly of special devices like cryptoLUKS, dmraid, mdraid or lvm.
+
+For more information, see [dracut cmdline's standard definition][7].
+
 ##### `rd.md`
 
 | NCN Type | Default Value(s) |
 | :------: | :------------: |
 | All | `1` |
+
+This parameter enables or disables `mdraid` in the initramFS.
 
 ##### `rd.dm`
 
@@ -472,11 +481,21 @@ For more information, see
 | :------: | :------------: |
 | All | `0` |
 
+This parameter enables or disables `dmraid` in the initramFS.
+
+> ***NOTE*** `dmraid` is not used by the NCNs.
+
 ##### `rd.neednet`
 
 | NCN Type | Default Value(s) |
 | :------: | :------------: |
 | All | `0` |
+
+Whether or not the network is necessary for boot.
+
+> ***NOTE*** This is useful for booting over an NFS or other network share, NCNs set this to `0`
+> because despite downloading a squashFS the `root` parameter is set to a disk FSLabel. As such, `root`
+> is *not* dependent on the network to come up.
 
 ##### `rd.peerdns`
 
@@ -484,11 +503,22 @@ For more information, see
 | :------: | :------------: |
 | All | `0` |
 
+Whether or not DNS should be resolved from peers.
+
+> ***NOTE*** This is set to `0` because it is inconsistent and the DNS will differ between boots.
+> Setting this to `0` removes question whether DNS was incorrect or not, if a DHCP lease was received
+> from CSM or PIT services then DNS will work unless core DNS providers are down.
+
 ##### `rd.md.waitclean`
 
 | NCN Type | Default Value(s) |
 | :------: | :------------: |
 | All | `1` |
+
+Whether RAID must be clean/synced before use.
+
+> ***NOTE*** Setting this to `0` will not workaround a dirty RAID, a dirty RAID will cause a boot
+> failure.
 
 ##### `rd.multipath`
 
@@ -496,6 +526,9 @@ For more information, see
 | :------: | :------------: |
 | All | `0` |
 
+Whether or not `multipath` is used in the initramFS and in the booted OS.
+
+> ***NOTE*** This will cause undesirable behavior when set to `1` on an NCN.
 
 ##### `rd.md.conf`
 
@@ -503,11 +536,22 @@ For more information, see
 | :------: | :------------: |
 | All | `1` |
 
+Whether or not `mdraid` should acknowledge any `md.conf` available in the initramFS.
+
+> ***NOTE*** This is important to set to `1`, otherwise `mdraid` will not acknowledge our NCN configuration
+> that specifically tells `mdraid` to not use hostnames for naming RAID devices. That means RAID `/dev/md/` 
+> devices will use the defined, expected names. 
+
 ##### `rd.bootif`
 
 | NCN Type | Default Value(s) |
 | :------: | :------------: |
 | All | `0` |
+
+This sets the boot interface.
+
+> ***NOTE*** This is deprecated in native dracut. NCNs set this to `0` to ensure nothing can
+> be coded to depend on it.
 
 ##### `hostname`
 
@@ -515,11 +559,15 @@ For more information, see
 | :------: | :------------: |
 | All | `<varies>` |
 
+Sets the hostname for the node within the initramFS.
+
 ##### `rd.net.timeout.carrier`
 
 | NCN Type | Default Value(s) |
 | :------: | :------------: |
 | All | `120` (seconds) |
+
+The amount of time dracut will wait for a carrier to come up on a requested device.
 
 ##### `rd.net.timeout.ifup`
 
@@ -527,11 +575,15 @@ For more information, see
 | :------: | :------------: |
 | All | `120` (seconds) |
 
+The amount of time dracut will wait for an interface to establish connectivity if it is requested.
+
 ##### `rd.net.timeout.iflink`
 
 | NCN Type | Default Value(s) |
 | :------: | :------------: |
 | All | `120` (seconds) |
+
+The amount of time dracut will wait for an interface to establish a link-up.
 
 ##### `rd.net.dhcp.retry`
 
@@ -539,17 +591,27 @@ For more information, see
 | :------: | :------------: |
 | All | `5` (attempts) |
 
+How many times DHCP will be attempted before dracut gives up.
+
+> ***NOTE*** If any `ip=` argument is set to `dhcp` (e.g. `ip=*:dhcp` or `ip=net0:dhcp`), then dracut
+> will fail if an IP is not provided. By setting an `ip=` argument to `dhcp` the user is telling dracut
+> that it is dependent on an IP lease.
+
 ##### `rd.net.timeout.ipv6auto`
 
 | NCN Type | Default Value(s) |
 | :------: | :------------: |
 | All | `0` |
 
+The amount of time dracut will wait for an interface using `ipv6auto` to receive its IPv6 information.
+
 ##### `rd.net.timeout.ipv6dad`
 
 | NCN Type | Default Value(s) |
 | :------: | :------------: |
 | All | `0` |
+
+The amount of time dracut will wait for an interface using `ipv6auto` to receive its IPv6 DAD information.
 
 ##### `append`
 
@@ -569,11 +631,19 @@ For more information, see
 | :------: | :------------: |
 | All | `exists` |
 
+Minimize the output from the initramFS to only `stderr`.
+
+> ***NOTE*** Setting `rd.info` will override this, and emit `stdout` to the console as well.
+
 ##### `crashkernel`
 
 | NCN Type | Default Value(s) |
 | :------: | :------------: |
 | All | `360M` |
+
+The amount of memory reserved in the event of a crash to run dump tools.
+
+This must be larger than the size of the `kdump` initrd located in `/boot`.
 
 ##### `log_buf_len`
 
@@ -581,11 +651,16 @@ For more information, see
 | :------: | :------------: |
 | All | `1` |
 
+Size of the kernel's internal log buffer by powers of 2.
+
 ##### `rd.retry`
 
 | NCN Type | Default Value(s) |
 | :------: | :------------: |
 | All | `10` |
+
+How long dracut should retry the initqueue to configure devices (in seconds). See the [misc][8] section
+of dracut.
 
 ##### `rd.shell`
 
@@ -593,11 +668,16 @@ For more information, see
 | :------: | :------------: |
 | All | `exists` |
 
+This parameter ensures that if the initramFS were to fail that a shell be created for an
+administrator to investigate and/or proide triage information.
+
 ##### `xname`
 
 | NCN Type | Default Value(s) |
 | :------: | :------------: |
 | All | <varies>
+
+This value sets the `xname` for the node, detailing the geolocation of the node.
 
 ### Packages
 
